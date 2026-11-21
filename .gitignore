@@ -1,0 +1,34 @@
+# 游戏数据与 ROM —— 绝对不要提交
+*.nds
+*.rom
+*.bin
+*.dat
+*.mods
+*.wav
+*.pak
+
+# 二进制提取结果
+emulator/
+rom_pages/
+files/
+roms/
+
+# 调试截图与临时输出
+*.png
+*.jpg
+*.jpeg
+*.gif
+diag_*/
+work/
+!work/*.py
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Git / 编辑器
+.git/
+*.swp
+.DS_Store
