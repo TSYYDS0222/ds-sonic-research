@@ -62,7 +62,7 @@ python scripts/split_games.py    # rebuild the 4 MB image and split per-game .md
 python scripts/verify.py         # disassemble page headers with capstone to sanity-check output
 ```
 
-This workflow only requires Python (plus `capstone` for `verify.py`). Output files are written to `rom_pages/` and `roms/`.
+This workflow only needs Python. The verification step additionally requires the capstone library. Generated files are written into the rom_pages and roms folders.
 
 ### 3. Inject a different MD ROM (experimental)
 
