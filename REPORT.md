@@ -321,6 +321,6 @@ The user reported v24 as "stuck on a black screen". Reproducing it with the melo
 ## 10. User Decided to Stop Injection and Restore the Original Data
 
 The user explicitly stated: "Drop Mortal Kombat, switch back to the original data." The original ROM was never modified:
-`D:/tsyyds/shijiamoniqi2.11/56dfeb...nds`, size 67,108,864 bytes, SHA-256 `56dfeb171d434dd37ad3336586ac026ebd309a4b84f37f7773257695ad9cfa91` (matching the filename).
+`D:/....../shijiamoniqi2.11/56dfeb...nds`, size 67,108,864 bytes, SHA-256 `56dfeb171d434dd37ad3336586ac026ebd309a4b84f37f7773257695ad9cfa91` (matching the filename).
 
 An unmodified clean copy has been placed at `roms/Sonic_Collection_original.nds` and verified to have the same hash. No further MK injection work will be done.
