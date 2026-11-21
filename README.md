@@ -46,8 +46,55 @@ Commonly used scripts:
 | `scripts/mcp_dumpbuf.py` | dump the 68K ROM buffer and verify its header |
 | `scripts/mcp_bp_blockD.py` | decompressor breakpoint tracing |
 
+## How to Use
+
+All scripts are standalone Python files that read local files and write results next to them. **Before running anything, open the script and edit the hardcoded paths at the top** (`ROM`, `NDS`, `MK`, `OUT`, `D`, etc.) to match your own machine. These paths point to the original author's setup and will not work as-is.
+
+### 1. Prepare your files
+
+- A legally owned copy of the original NDS game (the `.nds` used by the scripts).
+- Optionally, a legally owned MD/Genesis game image (`.md` / `.bin`) if you want to try an injection experiment.
+- If you want to run the headless-debug scripts, build `melonds-mcp` first (see Requirements).
+
+### 2. Extract and inspect the bundled ROMs (no emulator needed)
+
+```bash
+python scripts/nds.py            # parse the NDS header, FNT and FAT
+python scripts/final_extract.py  # decompress Game.pak into rom_pages/ (page_XXX.swab.bin)
+python scripts/split_games.py    # rebuild the 4 MB image and split per-game .md files
+python scripts/verify.py         # disassemble page headers with capstone to sanity-check output
+```
+
+This path only needs Python (plus `capstone` for `verify.py`). Outputs land in `rom_pages/` and `roms/`.
+
+### 3. Inject a different MD ROM (experimental)
+
+```bash
+python scripts/inject22.py   # baseline: writes pages into the @0x5C0 table
+python scripts/inject26.py   # corrected: writes into the real table @0x20B6840
+python scripts/inject28.py   # all-slot variant
+```
+
+Each injector pads the source `.md` to 4 MB, byte-swaps it (swab16), re-compresses the pages with `lz_ccms.py`, and rewrites the appropriate `{addr, size}` table entries in a copy of the NDS ROM. The result is a new `.nds` you can open in an emulator. **Injection is research-only**: as documented in `REPORT.md`, the ROM executes but a clean display has not been achieved.
+
+### 4. Debug with the headless emulator (melonds-mcp required)
+
+```bash
+python scripts/mcp_black_diag.py path/to/build.nds  # navigate the menu and capture screenshots
+python scripts/mcp_dumpbuf.py    path/to/build.nds  # dump the 68K ROM buffer at 0x02170000
+python scripts/mcp_bp_blockD.py  path/to/build.nds  # breakpoint on the decompressor
+```
+
+Pass the ROM to inspect as the first argument. These scripts drive melonDS without a GUI, so they work on machines where the emulator window will not open. Screenshots are written to `diag_*/` folders.
+
+### Notes
+
+- Run scripts from the `scripts/` directory, or run them by full path — imports such as `from lz_ccms import ...` assume the script's own folder is on `sys.path` (most injectors add it themselves).
+- The paths and addresses in the scripts are specific to the sample documented in `REPORT.md`. A different ROM or regional release will need its own offsets re-derived.
+- Always keep a clean copy of the original `.nds`; injectors write a separate output file and should never touch your source.
+
 ## Requirements
 
 - Python 3.10+
-- Most scripts use only the standard library; early screenshot scripts use Pillow.
+- Most scripts use only the standard library; `verify.py` needs `capstone`, and early screenshot scripts use Pillow.
 - Headless-debug scripts depend on `melonds-mcp` (the `mcp` branch of `sanduyin/melonDS-mcp`) and require you to build the DLL yourself. That dependency is not included here.
