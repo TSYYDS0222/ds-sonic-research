@@ -4,6 +4,14 @@ This project documents research into the structure and loading chain of the buil
 
 > You need to supply your own original NDS copy and your own MD game image before using these scripts. The local paths in the scripts are examples only; adjust them to your environment.
 
+## About the Emulator and the Games
+
+**The emulator.** Collection ships with a Sega Mega Drive / Genesis emulator derived from jEnesisDS. It is not a standalone program — its core is a hand-written ARM9 68K threaded interpreter statically linked into the main binary, dispatching through a 65,536-entry opcode table at `0x0202F480`. The 68K CPU core runs on the ARM9; audio (Z80 / YM2612) was not recovered from the ARM9 and is likely handled by the ARM7. The original jEnesisDS is known to cap game ROMs at 3 MB and to have VDP/graphics compatibility gaps with certain titles (community builds such as jEnesisDSPlus address part of this). Our tests confirm this in-collection build applies its own patches to the bundled ROMs.
+
+**The games.** The collection bundles four retail Mega Drive titles — Sonic the Hedgehog, Sonic the Hedgehog 2, Sonic the Hedgehog 3, and Sonic & Knuckles — 2 MB each. They are not stored as plain `.md` files. Each is split into 64 KB pages, compressed with a custom LZ77 variant, and packed into `image/Game.pak` as 128 pages (8 MB including mirrored pages). SEGA rewrote these ROMs for the release — stripping header fields, fixing the `$Axxx/$Fxxx` opcode bug, and removing two-player code — so the extracted images are collection-specific editions, not byte-identical to retail dumps.
+
+**What we did.** We reconstructed the container layout, the custom LZ77 decompression and the real runtime load chain, then tried swapping in other MD ROMs (Sonic 3D Blast, Mortal Kombat). The load chain and data path are fully verified — a foreign ROM header appears in the 68K ROM buffer at `0x02170000` and its code starts executing — but a clean game image is still blocked by the emulator's VDP compatibility and the limited number of mapped pages per game slot. See `REPORT.md` sections 6–9 for the full experiments.
+
 ## Key Findings
 
 See [`REPORT.md`](REPORT.md) for full details. Summary:
